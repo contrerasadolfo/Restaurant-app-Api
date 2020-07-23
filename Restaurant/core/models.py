@@ -34,8 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     direccion = models.CharField(max_length=250)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    tipo_user = models.IntegerField(default=0)    
-
+    tipo_user = models.IntegerField(default=0)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
