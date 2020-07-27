@@ -7,6 +7,7 @@ from rest_framework import status
 
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
+PERFIL_URL = reverse('user:perfil')
 
 def create_user(**params):
     return get_user_model().objects.create_user(**params)
@@ -91,6 +92,72 @@ class PublicUserApi(TestCase):
         res = self.client.post(TOKEN_URL, {'email': 'restaurant', 'password': ''})
         self.assertNotIn('token', res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # def test_retrieve_user_unauthorized(self):
+    #     """Prueba requiere autenticacion el usuario"""
+    #     res = self.client.get(PERFIL_URL)
+    #     self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+     
+
+class PrivateUserTests(TestCase):
+    """Prueba que solicita la autenticacion del usuario"""
+
+    def setUp(self):
+        self.user = create_user(
+            email='test@restaurant.com',
+            password='123456',
+            nombre='restaurante',
+            apellido='rest',
+            direccion='Venezuela',
+            tipo_user= 0
+        )
+
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_retrieve_profile_success(self):
+        """Prueba para recuperar el perfil"""
+        res = self.client.get(PERFIL_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, {
+            'id': res.data['id'],
+            'email': self.user.email,
+            'nombre': self.user.nombre,
+            'apellido': self.user.apellido,
+            'direccion': self.user.direccion,
+            'tipo_user': self.user.tipo_user,
+            
+        })
+    
+    def test_post_me_not_allowed(self):
+        """Prueba para no permitir POST con la PERFIL_URL"""
+        res = self.client.post(PERFIL_URL, {})
+
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_update_user_profile(self):
+        """Prueba para actualizar perfil de usuario"""
+        payload = {
+            'nombre': 'new', 
+            'apellido': 'newapellido', 
+            'direccion': 'nesDirec', 
+            'password':'newpassword'
+            }
+
+        res = self.client.patch(PERFIL_URL, payload)
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.nombre, payload['nombre'])
+        self.assertEqual(self.user.apellido, payload['apellido'])
+        self.assertEqual(self.user.direccion, payload['direccion'])
+
+
+        self.assertTrue(self.user.check_password(payload['password']))
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+
 
 
 

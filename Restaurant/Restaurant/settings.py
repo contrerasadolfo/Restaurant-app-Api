@@ -16,6 +16,8 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 
@@ -27,6 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# DATE_INPUT_FORMATS = ['%d/%m/%Y %H:%M']
 
 # Application definition
 
@@ -40,8 +43,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'core',
-    'user'
+    'user',
+    'cliente',
+
 ]
+
+# Manejo de archivos e imag
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -52,6 +61,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+# Personalizacion del error 'non_field_errors' general de serializadores
+REST_FRAMEWORK = {
+    'NON_FIELD_ERRORS_KEY': 'error'
+}
+
 
 ROOT_URLCONF = 'Restaurant.urls'
 
@@ -90,6 +106,12 @@ DATABASES = {
 }
 
 
+# REST_FRAMEWORK = {
+#     'PAGE_SIZE': 10
+# }
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
 
@@ -118,7 +140,7 @@ TIME_ZONE = 'America/Caracas'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = True # Incluye forma de fecha
 
 USE_TZ = True
 
